@@ -20,8 +20,11 @@ public interface TasksRepo extends JpaRepository<Tasks,Integer> {
             "(:title IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%',:title,'%'))) AND " +
             "(:description IS NULL OR LOWER(t.description) LIKE LOWER(CONCAT('%',:description,'%'))) AND " +
             "(:priority IS NULL OR LOWER(t.priority) LIKE LOWER(CONCAT('%',:priority,'%'))) AND " +
-            "(:status IS NULL OR LOWER(t.status) LIKE LOWER(CONCAT('%',:status,'%')))")
-    List<Tasks> searchTasksFromUser(String title,String description,String status,String priority,int user_id);
+            "(:status IS NULL OR LOWER(t.status) LIKE LOWER(CONCAT('%',:status,'%'))) AND " +
+            "(:overdue IS NULL OR (:overdue = true AND t.dueDate < CURRENT_TIMESTAMP ) OR " +
+                                " (:overdue = false AND t.dueDate >= CURRENT_TIMESTAMP )) AND " +
+            "(:excludeCompleted IS NULL OR (:excludeCompleted = true AND t.status <> 'completed' ))" )
+    List<Tasks> searchTasksFromUser(String title,String description,String status,String priority,Boolean overdue,Boolean excludeCompleted,int user_id);
 
 
     // search tasks from all the users (used by only admin)

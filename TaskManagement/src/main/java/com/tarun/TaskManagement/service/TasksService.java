@@ -56,9 +56,9 @@ public class TasksService {
     }
 
     //this is to search specific user's tasks
-    public List<Tasks> searchTasksFromUser(String title,String description,String status,String priority) {
+    public List<Tasks> searchTasksFromUser(String title,String description,String status,String priority,Boolean overdue,Boolean excludeCompleted) {
         Users user = getUserInfo();
-        return tasksRepo.searchTasksFromUser(title,description,status,priority,user.getId());
+        return tasksRepo.searchTasksFromUser(title,description,status,priority,overdue,excludeCompleted,user.getId());
 
     }
 
@@ -142,8 +142,8 @@ public class TasksService {
 
     //this is to search tasks from specific user
     @PreAuthorize("hasRole('ADMIN')")
-    public List<Tasks> searchAllTasksFromUser(String title,String description,String status,String priority,int id){
-            return tasksRepo.searchTasksFromUser(title,description,status,priority,id);
+    public List<Tasks> searchAllTasksFromUser(String title,String description,String status,String priority,Boolean overdue,Boolean excludeCompleted,int id){
+            return tasksRepo.searchTasksFromUser(title,description,status,priority,overdue,excludeCompleted,id);
     }
 
 

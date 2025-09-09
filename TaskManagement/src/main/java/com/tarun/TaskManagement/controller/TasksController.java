@@ -40,8 +40,11 @@ public class TasksController {
     public List<Tasks> searchTasks(@RequestParam(required = false) String title,
                                    @RequestParam(required = false) String description,
                                    @RequestParam(required = false) String status,
-                                   @RequestParam(required = false) String priority){
-        return service.searchTasksFromUser(title,description,status,priority);
+                                   @RequestParam(required = false) String priority,
+                                   @RequestParam(required = false) Boolean overdue,
+                                   @RequestParam(required = false) Boolean excludeCompleted)
+    {
+        return service.searchTasksFromUser(title,description,status,priority,overdue,excludeCompleted);
     }
 
     //to add new task of the user
@@ -94,8 +97,10 @@ public class TasksController {
                                               @RequestParam(required = false) String description,
                                               @RequestParam(required = false) String status,
                                               @RequestParam(required = false) String priority,
+                                              @RequestParam(required = false) Boolean overdue,
+                                              @RequestParam(required = false) Boolean excludeCompleted,
                                               @PathVariable int id){
-        return service.searchAllTasksFromUser(title,description,status,priority,id);
+        return service.searchAllTasksFromUser(title,description,status,priority,overdue,excludeCompleted,id);
     }
 
 }
