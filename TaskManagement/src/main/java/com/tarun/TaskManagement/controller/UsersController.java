@@ -1,9 +1,11 @@
 package com.tarun.TaskManagement.controller;
 
+import com.tarun.TaskManagement.exception.ApiResponseModel;
 import com.tarun.TaskManagement.model.Users;
 import com.tarun.TaskManagement.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -29,9 +31,10 @@ public class UsersController {
 
     //to register a new user
     @PostMapping("/register")
-    public String register(@RequestBody Users user){
-        System.out.println("Register controller : " + user);
-        return service.register(user);
+    public ResponseEntity<ApiResponseModel<Void>> register(@RequestBody Users user){
+//        System.out.println("User tried to register : " + user);
+        ApiResponseModel<Void> response = service.register(user);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     //to login a registered user
