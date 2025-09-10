@@ -1,10 +1,12 @@
 package com.tarun.TaskManagement.service;
 
+import com.tarun.TaskManagement.exception.MissingFieldException;
 import com.tarun.TaskManagement.model.Tasks;
 import com.tarun.TaskManagement.model.Users;
 import com.tarun.TaskManagement.repository.TasksRepo;
 import com.tarun.TaskManagement.repository.UsersRepo;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.PropertyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,9 +48,14 @@ public class TasksService {
     }
 
     //this is to add a new task
-    @PreAuthorize("hasRole('USER')")
-    public Tasks addTask(Tasks task) {
+    public Tasks addTask(Tasks task) throws IllegalAccessException {
         Users user = getUserInfo();
+        if(!user.getRole().equals("ROLE_USER")){
+            throw new IllegalAccessException("Only users can create task.");
+        }
+        if(task.getDueDate() == null || task.getDescription() == null || task.getTitle() == null || task.getPriority() == null || task.getStatus() == null){
+            throw new MissingFieldException("Missing field. These fields are mandatory : dueDate, title, description, priority, status.");
+        }
         task.setUser(user);
         task.setCreatedAt(LocalDateTime.now());
         task.setLastModifiedAt(LocalDateTime.now());
@@ -66,15 +73,13 @@ public class TasksService {
     public Tasks getTaskById(int id) throws IllegalAccessException {
         int userId = getUserInfo().getId();
         Tasks task = tasksRepo.findById(id).orElse(null);
-
         if(task == null){
-            throw new EntityNotFoundException("Not found");
+            throw new EntityNotFoundException("Task Not Found with the task id : " + id);
         }
-
         if(userId == task.getUser().getId()){
             return task;
         }
-        throw new IllegalAccessException("Unauthorized");
+        throw new IllegalAccessException("Unauthorized for the task with task id : " + id);
     }
 
     //this is to update task as a user,
@@ -84,9 +89,11 @@ public class TasksService {
         Tasks dbTask = tasksRepo.findById(id).orElse(null);                 //get the task from db with task id
 
         if(dbTask == null){
-            throw new EntityNotFoundException("Not found");                       //if not found task with task id
+            throw new EntityNotFoundException("Task not found for the id : " + id);                       //if not found task with task id
         }
-
+        if(task.getStatus() == null || task.getPriority() ==null || task.getDueDate() == null|| task.getTitle() == null|| task.getDescription()==null){
+            throw new MissingFieldException("Missing field. All these fields are mandatory to update task : dueDate, title, description, priority, status. ");
+        }
         if(userId == dbTask.getUser().getId()){                                   //check whether user id is same in both the task and user principal
             Users user = getUserInfo();
             task.setUser(user);
@@ -99,7 +106,7 @@ public class TasksService {
 
             return tasksRepo.save(dbTask);
         }
-        throw new IllegalAccessException("Unauthorized");
+        throw new IllegalAccessException("Unauthorized for updating the task with id : " + id);
     }
 
     @PreAuthorize("hasRole('USER')")
