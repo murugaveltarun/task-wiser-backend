@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
@@ -52,8 +53,7 @@ public class UsersService {
             System.out.println("Token generated for userId : " + dbUser.getUsername() + " token : " + token);
             return token;
         }
-        return "Failed";
-
+        throw new BadCredentialsException("Invalid username or password.");
     }
 
 }

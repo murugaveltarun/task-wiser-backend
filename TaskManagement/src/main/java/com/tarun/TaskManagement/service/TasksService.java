@@ -109,13 +109,12 @@ public class TasksService {
         throw new IllegalAccessException("Unauthorized for updating the task with id : " + id);
     }
 
-    @PreAuthorize("hasRole('USER')")
-    public void deleteTask(int id) {
+    public void deleteTask(int id) throws IllegalAccessException {
         int userId = getUserInfo().getId();
         Tasks task = tasksRepo.findById(id).orElseThrow(()-> new EntityNotFoundException("Task not found with this id : " + id));
 
         if(userId != task.getUser().getId()){
-            throw new AccessDeniedException("Unauthorized");
+            throw new IllegalAccessException("Unauthorized");
         }
         tasksRepo.deleteById(task.getTaskId());
     }

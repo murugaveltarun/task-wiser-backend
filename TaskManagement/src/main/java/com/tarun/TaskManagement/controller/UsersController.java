@@ -5,6 +5,7 @@ import com.tarun.TaskManagement.model.Users;
 import com.tarun.TaskManagement.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -39,9 +40,10 @@ public class UsersController {
 
     //to login a registered user
     @PostMapping("/login")
-    public String login(@RequestBody Users user){
+    public ResponseEntity<ApiResponseModel<String>>  login(@RequestBody Users user){
         System.out.println("Login controller : " + user);
-        return service.verify(user);
+        ApiResponseModel<String> response = new ApiResponseModel<>(true,"User Verified.", HttpStatus.OK.value(),service.verify(user));
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
 

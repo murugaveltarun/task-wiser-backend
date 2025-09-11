@@ -62,7 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.setContentType("application/json");
 
-                ApiResponseModel<Void> errorResponse = new ApiResponseModel<>(false,"JWT Token Expired. Please login again",HttpStatus.UNAUTHORIZED.value(), null);
+                ApiResponseModel<Void> errorResponse = new ApiResponseModel<>(false,"JWT Token Expired. Please login again",440, null);
                 ObjectMapper mapper = new ObjectMapper();
                 response.getWriter().write(mapper.writeValueAsString(errorResponse));
         }

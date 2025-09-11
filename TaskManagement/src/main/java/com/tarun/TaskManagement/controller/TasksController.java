@@ -78,8 +78,10 @@ public class TasksController {
 
     //to delete task of the user
     @DeleteMapping("/task/{id}")
-    public void deleteTask(@PathVariable int id) {
+    public ResponseEntity<ApiResponseModel<Void>> deleteTask(@PathVariable int id) throws IllegalAccessException {
         service.deleteTask(id);
+        ApiResponseModel<Void> response = new ApiResponseModel<>(true,"Task Deleted Successfully.",HttpStatus.OK.value(),null);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
 
