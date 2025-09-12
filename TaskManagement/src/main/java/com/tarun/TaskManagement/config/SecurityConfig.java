@@ -36,7 +36,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request.requestMatchers("/register","/login").permitAll().requestMatchers("/users/**").hasRole("ADMIN").anyRequest().authenticated())
+                .authorizeHttpRequests(request -> request.requestMatchers("/register","/login","/refresh").permitAll().requestMatchers("/users/**").hasRole("ADMIN").anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

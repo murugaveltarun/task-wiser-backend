@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<ApiResponseModel<Void>> handleExpiredJwt(ExpiredJwtException e){
-        ApiResponseModel<Void> response = new ApiResponseModel<>(false,"JWT Token is expired. Please log in again.", HttpStatus.UNAUTHORIZED.value(), null);
+        ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(), HttpStatus.UNAUTHORIZED.value(), null);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 

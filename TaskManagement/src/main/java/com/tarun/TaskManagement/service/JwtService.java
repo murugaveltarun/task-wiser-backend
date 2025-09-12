@@ -27,17 +27,34 @@ public class JwtService {
         claims.put("role",user.getRole());
         claims.put("name",user.getName());
 
-
-
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 *60 ))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
                 .and()
                 .signWith(getKey(), Jwts.SIG.HS256)
                 .compact();
+    }
+
+    public String generateRefreshToken(Users user) {
+
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("role",user.getRole());
+
+        String refreshToken = Jwts.builder()
+                .claims()
+                .add(claims)
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 60 ))
+                .and()
+                .signWith(getKey(), Jwts.SIG.HS256)
+                .compact();
+
+        System.out.println(user.getUsername() + " refresh token : " + refreshToken);
+        return refreshToken;
     }
 
     public SecretKey getKey() {
