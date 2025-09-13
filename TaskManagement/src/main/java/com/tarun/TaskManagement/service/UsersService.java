@@ -9,7 +9,6 @@ import com.tarun.TaskManagement.repository.ForgotPasswordRepo;
 import com.tarun.TaskManagement.repository.UsersRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -23,7 +22,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -106,6 +104,7 @@ public class UsersService {
         String accessToken = service.generateToken(user);
         System.out.println("Access token generated for user '" + username + "' : " + accessToken);
         return accessToken;
+
     }
 
     public void forgotPassword(Users user) {
@@ -132,6 +131,7 @@ public class UsersService {
             throw new BadCredentialsException("Token not found");
         }
         if(forgotPassword.getExpiry().isBefore(LocalDateTime.now())){
+            System.out.println("expired");
             throw new AccessDeniedException("Token expired");
         }
         Users dbUser = repo.findById(forgotPassword.getUserId()).orElse(null);
@@ -139,8 +139,9 @@ public class UsersService {
             throw new IllegalAccessException("User not found");
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-        System.out.println("Password changed for '" + dbUser.getUsername() +"' sucessfully.");
+        System.out.println("Password changed for '" + dbUser.getUsername() +"' successfully.");
         dbUser.setPassword(encoder.encode(resetPassword.getPassword()));
         repo.save(dbUser);
+        forgotRepo.deleteById(forgotPassword.getUserId());
     }
 }

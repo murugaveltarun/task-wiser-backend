@@ -5,11 +5,11 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.nio.file.attribute.UserPrincipalNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,6 +23,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalAccessException.class)
     public ResponseEntity<ApiResponseModel<Void>> handleIllegalAccessException(IllegalAccessException e){
         ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(),HttpStatus.UNAUTHORIZED.value(), null);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponseModel<Void>> handleIllegalAccessException(AccessDeniedException e){
+        ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(),HttpStatus.BAD_REQUEST.value(), null);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
