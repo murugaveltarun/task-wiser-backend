@@ -9,6 +9,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.attribute.UserPrincipalNotFoundException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -41,4 +43,5 @@ public class GlobalExceptionHandler {
         ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(),HttpStatus.UNAUTHORIZED.value(), null);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+
 }

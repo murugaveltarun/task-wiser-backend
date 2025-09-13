@@ -34,6 +34,8 @@ public class Users {
     @Column(name = "name",nullable = false)
     private String name;
 
+    @Column(name = "email",nullable = false,unique = true)
+    private String email;
 
 
 
@@ -52,6 +54,7 @@ public class Users {
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 
@@ -94,5 +97,13 @@ public class Users {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

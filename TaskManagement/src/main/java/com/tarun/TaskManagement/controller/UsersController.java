@@ -1,6 +1,7 @@
 package com.tarun.TaskManagement.controller;
 
 import com.tarun.TaskManagement.exception.ApiResponseModel;
+import com.tarun.TaskManagement.model.ResetPassword;
 import com.tarun.TaskManagement.model.Users;
 import com.tarun.TaskManagement.service.UsersService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,5 +53,54 @@ public class UsersController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponseModel<Void>> forgotPassword(@RequestBody Users user){
+        service.forgotPassword(user);
+        ApiResponseModel<Void> response = new ApiResponseModel<>(true,"Reset password link will be sent if the email exists.",HttpStatus.OK.value(), null);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponseModel<Void>> resetPassword(@RequestBody ResetPassword resetPassword) throws IllegalAccessException {
+        service.resetPassword(resetPassword);
+        ApiResponseModel<Void> response = new ApiResponseModel<>(true,"Password reset success",HttpStatus.OK.value(), null);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
