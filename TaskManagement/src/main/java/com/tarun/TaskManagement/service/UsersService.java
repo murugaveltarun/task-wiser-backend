@@ -10,6 +10,7 @@ import com.tarun.TaskManagement.repository.ForgotPasswordRepo;
 import com.tarun.TaskManagement.repository.UsersRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -48,6 +49,9 @@ public class UsersService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
 
     public ApiResponseModel<Void> register(Users user){
@@ -126,7 +130,7 @@ public class UsersService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(dbUser.getEmail());
             message.setSubject("Password reset request from Taskwiser for " + dbUser.getUsername() );
-            message.setText("Username : " + dbUser.getUsername() + "\nClick the given link to reset your password. \nhttp://localhost:5173/reset-password/" + token +
+            message.setText("Username : " + dbUser.getUsername() + "\nClick the given link to reset your password. \n" + frontendUrl + "/reset-password/" + token +
                     "\nThe reset link expires in one hour.");
             mailSender.send(message);
 

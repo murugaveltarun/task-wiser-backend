@@ -1,6 +1,5 @@
 # Spring Boot sensitive files
-/src/main/resources/application.properties
-/src/main/resources/application-*.properties
+
 .env
 .secrets/
 

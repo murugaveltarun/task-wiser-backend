@@ -5,6 +5,7 @@ import com.tarun.TaskManagement.model.Users;
 import com.tarun.TaskManagement.repository.UsersRepo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +26,8 @@ public class Oauth2Service {
     @Autowired
     private JwtService service;
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     public RedirectView auth(OAuth2AuthenticationToken token, HttpServletResponse response) {
 
@@ -80,7 +83,6 @@ public class Oauth2Service {
 
             System.out.println("cookie header" + cookie.toString());
 
-            String frontendUrl = "http://localhost:5173";
             return new RedirectView(frontendUrl + "/oauth2/callback/" + accessToken);
         }
         throw new BadCredentialsException("Invalid username or password.");
