@@ -1,33 +1,28 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Spring Boot sensitive files
+/src/main/resources/application.properties
+/src/main/resources/application-*.properties
+.env
+.secrets/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Logs
+*.log
 
-### IntelliJ IDEA ###
-.idea
+# Node / React
+/node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Frontend build
+/dist/
+/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE / Editor files (you already have these)
+.idea/
 *.iws
 *.iml
 *.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
 .vscode/
