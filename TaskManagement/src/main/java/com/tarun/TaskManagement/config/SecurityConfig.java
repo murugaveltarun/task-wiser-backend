@@ -5,6 +5,7 @@ import com.tarun.TaskManagement.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -30,13 +31,33 @@ public class SecurityConfig {
     @Autowired
     private MyUserDetailsService userDetailsService;
 
+    @Bean
+    @Order(1)
+    public SecurityFilterChain oauthSecurityChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/login/oauth2/**","/oauth2/**")
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+                .oauth2Login(oauth -> oauth
+                        .defaultSuccessUrl("/oauth2/success", true)
+                        .failureUrl("/oauth2/failed")
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .build();
+    }
+
+
 
     @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request.requestMatchers("/register","/login","/refresh","/forgot-password","/reset-password").permitAll().requestMatchers("/users/**").hasRole("ADMIN").anyRequest().authenticated())
+                .authorizeHttpRequests(request -> request.requestMatchers("/open","/register","/login","/refresh","/forgot-password","/reset-password").permitAll().requestMatchers("/users/**").hasRole("ADMIN").anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -47,6 +49,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponseModel<Void>> handleBadCredentialsException(BadCredentialsException e){
         ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(),HttpStatus.UNAUTHORIZED.value(), null);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(CredentialsExpiredException.class)
+    public ResponseEntity<ApiResponseModel<Void>> handleCredentialsExpiredException(CredentialsExpiredException e){
+        ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(),HttpStatus.UNAUTHORIZED.value(), null);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ApiResponseModel<Void>> handleUsernameNotFoundException(UsernameNotFoundException e){
+        ApiResponseModel<Void> response = new ApiResponseModel<>(false,e.getMessage(),HttpStatus.NOT_FOUND.value(), null);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 

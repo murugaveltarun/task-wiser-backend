@@ -12,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-
 @NoArgsConstructor
 @AllArgsConstructor
 public class Users {
@@ -21,10 +20,10 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "username", nullable = false, unique = true, length = 20)
+    @Column(name = "username", nullable = true, unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -37,6 +36,11 @@ public class Users {
     @Column(name = "email",nullable = false,unique = true)
     private String email;
 
+    @Column(name = "auth_provider", nullable = false, length = 10)
+    private String authProvider;
+
+    @Column(name = "provider_id",nullable = true, unique = true)
+    private String providerId;
 
 
     //defining the relation with tasks. here we have one to many relation.
@@ -55,6 +59,8 @@ public class Users {
                 ", role='" + role + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", authProvider='" + authProvider + '\'' +
+                ", providerId='" + providerId + '\'' +
                 '}';
     }
 
@@ -101,6 +107,22 @@ public class Users {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(String authProvider) {
+        this.authProvider = authProvider;
+    }
+
+    public String getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
     public void setEmail(String email) {

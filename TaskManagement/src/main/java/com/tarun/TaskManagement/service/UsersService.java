@@ -1,6 +1,7 @@
 package com.tarun.TaskManagement.service;
 
 import com.tarun.TaskManagement.exception.ApiResponseModel;
+import com.tarun.TaskManagement.exception.MissingFieldException;
 import com.tarun.TaskManagement.model.ForgotPassword;
 import com.tarun.TaskManagement.model.ResetPassword;
 import com.tarun.TaskManagement.model.UserPrincipal;
@@ -17,9 +18,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -57,12 +62,16 @@ public class UsersService {
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
         user.setPassword(encoder.encode(user.getPassword()));
+        user.setAuthProvider("local");
         repo.save(user);
         System.out.println("User Created successfully with username : " + user.getUsername()  + " and password : " + user.getPassword());
         return new ApiResponseModel<>(true,"User Created Successfully", HttpStatus.CREATED.value(),null);
     }
 
     public String verify(Users user, HttpServletResponse response){
+        if(user.getUsername() == null || user.getPassword() == null){
+            throw new MissingFieldException("Username and Password is necessary for login.");
+        }
         System.out.println(user);
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
         if(authentication.isAuthenticated()){
@@ -128,11 +137,11 @@ public class UsersService {
     public void resetPassword(ResetPassword resetPassword) throws IllegalAccessException {
         ForgotPassword forgotPassword = forgotRepo.findByToken(resetPassword.getToken());
         if(forgotPassword == null){
-            throw new BadCredentialsException("Token not found");
+            throw new UsernameNotFoundException("Token not found");
         }
         if(forgotPassword.getExpiry().isBefore(LocalDateTime.now())){
             System.out.println("expired");
-            throw new AccessDeniedException("Token expired");
+            throw new CredentialsExpiredException("Token expired");
         }
         Users dbUser = repo.findById(forgotPassword.getUserId()).orElse(null);
         if(dbUser == null){
@@ -144,4 +153,6 @@ public class UsersService {
         repo.save(dbUser);
         forgotRepo.deleteById(forgotPassword.getUserId());
     }
+
+
 }

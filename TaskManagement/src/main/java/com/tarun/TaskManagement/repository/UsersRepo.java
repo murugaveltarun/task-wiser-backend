@@ -18,4 +18,10 @@ public interface UsersRepo extends JpaRepository<Users,Integer> {
 
     //search by role
     List<Users> findByRole(String userRole);
+
+    //find by authProvider and providerId
+    Users findByAuthProviderAndProviderId(String authProvider, String providerId);
+
+    //find by authProvider and email
+    Users findByAuthProviderAndEmail(String authProvider, String email);
 }
