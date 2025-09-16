@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 public class Oauth2Service {
@@ -38,8 +39,12 @@ public class Oauth2Service {
         oauthUser.setRole("ROLE_USER");
         oauthUser.setName((String) token.getPrincipal().getAttributes().get("name"));
         oauthUser.setEmail((String) token.getPrincipal().getAttributes().get("email"));
+        oauthUser.setLastLoginAt(LocalDateTime.now());
+        oauthUser.setActive(true);
 
         Users dbUser = repo.findByAuthProviderAndProviderId(oauthUser.getAuthProvider(), oauthUser.getProviderId());
+        dbUser.setLastLoginAt(LocalDateTime.now());
+        repo.save(dbUser);
 
         if(dbUser == null){
 
@@ -47,6 +52,7 @@ public class Oauth2Service {
 
             if(emailUser == null){
                 //register fully new
+                oauthUser.setCreatedAt(LocalDateTime.now());
                 dbUser = repo.save(oauthUser);
             }else{
                 //user already exist. so just update authProvider and providerId

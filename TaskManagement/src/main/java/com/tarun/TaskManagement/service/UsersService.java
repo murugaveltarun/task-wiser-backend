@@ -67,6 +67,8 @@ public class UsersService {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
         user.setPassword(encoder.encode(user.getPassword()));
         user.setAuthProvider("local");
+        user.setActive(true);
+        user.setCreatedAt(LocalDateTime.now());
         repo.save(user);
         System.out.println("User Created successfully with username : " + user.getUsername()  + " and password : " + user.getPassword());
         return new ApiResponseModel<>(true,"User Created Successfully", HttpStatus.CREATED.value(),null);
@@ -94,8 +96,9 @@ public class UsersService {
                     .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-            System.out.println("cookie header" + cookie.toString());
+            dbUser.setLastLoginAt(LocalDateTime.now());
+            repo.save(dbUser);
+            System.out.println("cookie header" + cookie);
             return accessToken;
         }
         throw new BadCredentialsException("Invalid username or password.");
@@ -115,6 +118,8 @@ public class UsersService {
             throw new IllegalAccessException("Invalid Token or Expired Token");
         }
         String accessToken = service.generateToken(user);
+        user.setLastLoginAt(LocalDateTime.now());
+        repo.save(user);
         System.out.println("Access token generated for user '" + username + "' : " + accessToken);
         return accessToken;
 
@@ -122,7 +127,7 @@ public class UsersService {
 
     public void forgotPassword(Users user) {
         Users dbUser = repo.findByEmail(user.getEmail());
-        if(dbUser != null){
+        if(dbUser != null && dbUser.getPassword() != null){
             String token = UUID.randomUUID().toString();
             ForgotPassword forgotPassword = new ForgotPassword(dbUser.getId(),token, LocalDateTime.now().plusHours(1));
             forgotRepo.save(forgotPassword);

@@ -19,16 +19,22 @@ public class Tasks {
 
     @Column(name = "title" , nullable = false)
     private String title;
+
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
+
     @Column(name = "status" , nullable = false)
     private String status;
+
     @Column(name = "priority" , nullable = false)
     private String priority;
+
     @Column(name = "dueDate" , nullable = false)
     private LocalDateTime dueDate;
+
     @Column(name="lastModifiedAt")
     private LocalDateTime lastModifiedAt;
+
     @Column(name="createdAt")
     private LocalDateTime createdAt;
 
@@ -129,15 +135,3 @@ public class Tasks {
                 '}';
     }
 }
-/*
-    SAMPLE DATA FOR POSTING TASK
-{
-    "title": "My Task",
-    "description": "my task is to blah blah blah. and how to do my task is blah blah blah.",
-    "status": "completed",
-    "priority" : "high",
-    "dueDate": "2004-01-01"
-}
-
-
-*/

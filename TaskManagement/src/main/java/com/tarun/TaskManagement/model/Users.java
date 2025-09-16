@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,15 @@ public class Users {
     @Column(name = "provider_id",nullable = true, unique = true)
     private String providerId;
 
+    @Column(name="created_at", nullable = true)
+    private LocalDateTime createdAt;
+
+    @Column(name="last_login_at",nullable = true)
+    private LocalDateTime lastLoginAt;
+
+    @Column(name="is_active",nullable = false)
+    private boolean isActive;
+
 
     //defining the relation with tasks. here we have one to many relation.
     //ONE is USERS
@@ -61,6 +71,9 @@ public class Users {
                 ", email='" + email + '\'' +
                 ", authProvider='" + authProvider + '\'' +
                 ", providerId='" + providerId + '\'' +
+                ", isActive='" + isActive + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", lastLoginAt='" + lastLoginAt + '\'' +
                 '}';
     }
 
@@ -127,5 +140,29 @@ public class Users {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
