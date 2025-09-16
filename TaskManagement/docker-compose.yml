@@ -1,0 +1,41 @@
+
+
+services:
+  app:
+    image: tarun/task-wiser:v3
+    restart: always
+    ports:
+      - "8080:8080"
+      - "5173:5173"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL
+      - DB_USERNAME
+      - DB_PASSWORD
+      - GOOGLE_OAUTH_CLIENT_ID
+      - GOOGLE_OAUTH_CLIENT_SECRET
+      - GITHUB_OAUTH_CLIENT_ID
+      - GITHUB_OAUTH_CLIENT_SECRET
+      - MAIL_USERNAME
+      - MAIL_PASSWORD
+      - MAIL_HOST
+      - MAIL_PORT
+      - FRONTEND_URL
+      - SECRET_KEY
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: kali
+      MYSQL_DATABASE: task_management
+      MYSQL_PASSWORD: kali
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

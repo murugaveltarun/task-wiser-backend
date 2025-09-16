@@ -27,6 +27,11 @@ public class UsersController {
     private Oauth2Service oauthService;
 
 
+    @GetMapping("/")
+    public String hello(){
+        return "Hello";
+    }
+
     //to register a new user
     @PostMapping("/register")
     public ResponseEntity<ApiResponseModel<Void>> register(@RequestBody Users user){

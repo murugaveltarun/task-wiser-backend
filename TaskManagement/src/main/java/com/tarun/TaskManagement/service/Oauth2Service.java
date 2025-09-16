@@ -43,8 +43,6 @@ public class Oauth2Service {
         oauthUser.setActive(true);
 
         Users dbUser = repo.findByAuthProviderAndProviderId(oauthUser.getAuthProvider(), oauthUser.getProviderId());
-        dbUser.setLastLoginAt(LocalDateTime.now());
-        repo.save(dbUser);
 
         if(dbUser == null){
 
@@ -53,6 +51,7 @@ public class Oauth2Service {
             if(emailUser == null){
                 //register fully new
                 oauthUser.setCreatedAt(LocalDateTime.now());
+                oauthUser.setLastLoginAt(LocalDateTime.now());
                 dbUser = repo.save(oauthUser);
             }else{
                 //user already exist. so just update authProvider and providerId
