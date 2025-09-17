@@ -31,7 +31,7 @@ public class Oauth2Service {
     private String frontendUrl;
 
     public RedirectView auth(OAuth2AuthenticationToken token, HttpServletResponse response) {
-
+        System.out.println(token);
         Users oauthUser = new Users();
         oauthUser.setProviderId(token.getName());
         oauthUser.setUsername(token.getName());
@@ -39,34 +39,37 @@ public class Oauth2Service {
         oauthUser.setRole("ROLE_USER");
         oauthUser.setName((String) token.getPrincipal().getAttributes().get("name"));
         oauthUser.setEmail((String) token.getPrincipal().getAttributes().get("email"));
-        oauthUser.setLastLoginAt(LocalDateTime.now());
         oauthUser.setActive(true);
 
         Users dbUser = repo.findByAuthProviderAndProviderId(oauthUser.getAuthProvider(), oauthUser.getProviderId());
 
-        if(dbUser == null){
-
+        if (dbUser == null) {
             Users emailUser = repo.findByEmail(oauthUser.getEmail());
 
-            if(emailUser == null){
-                //register fully new
+            if (emailUser == null) {
+                // completely new user
                 oauthUser.setCreatedAt(LocalDateTime.now());
                 oauthUser.setLastLoginAt(LocalDateTime.now());
                 dbUser = repo.save(oauthUser);
-            }else{
-                //user already exist. so just update authProvider and providerId
+            } else {
+                // existing user signing in with oauth first time
                 emailUser.setAuthProvider(oauthUser.getAuthProvider());
                 emailUser.setProviderId(oauthUser.getProviderId());
+                emailUser.setLastLoginAt(LocalDateTime.now());
                 dbUser = repo.save(emailUser);
             }
-
+        } else {
+            // old user  in with oauth
+            dbUser.setLastLoginAt(LocalDateTime.now());
+            dbUser = repo.save(dbUser);
         }
-        System.out.println(oauthUser);
-        // old user logging in
 
-        if(dbUser.getAuthProvider() == null || dbUser.getProviderId() == null){
+        // safety check
+        if (dbUser == null || dbUser.getAuthProvider() == null || dbUser.getProviderId() == null) {
             throw new MissingFieldException("Login Failed");
         }
+
+
         System.out.println(dbUser);
         if(token.isAuthenticated()){
             System.out.println("below");

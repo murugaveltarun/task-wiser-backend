@@ -6,7 +6,6 @@ services:
     restart: always
     ports:
       - "8080:8080"
-      - "5173:5173"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - DB_URL
@@ -31,7 +30,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: kali
       MYSQL_DATABASE: task_management
-      MYSQL_PASSWORD: kali
     ports:
       - "3307:3306"
     volumes:
