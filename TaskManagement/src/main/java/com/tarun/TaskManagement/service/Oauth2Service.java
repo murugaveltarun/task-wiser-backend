@@ -38,7 +38,13 @@ public class Oauth2Service {
         oauthUser.setAuthProvider(token.getAuthorizedClientRegistrationId());
         oauthUser.setRole("ROLE_USER");
         oauthUser.setName((String) token.getPrincipal().getAttributes().get("name"));
-        oauthUser.setEmail((String) token.getPrincipal().getAttributes().get("email"));
+        if (token.getPrincipal().getAttributes().get("email") == null
+                && token.getAuthorizedClientRegistrationId().equals("github")) {
+            oauthUser.setEmail(oauthUser.getUsername() + "@github.com");
+        } else {
+            oauthUser.setEmail((String) token.getPrincipal().getAttributes().get("email"));
+        }
+
         oauthUser.setActive(true);
 
         Users dbUser = repo.findByAuthProviderAndProviderId(oauthUser.getAuthProvider(), oauthUser.getProviderId());
