@@ -38,6 +38,9 @@ public class Oauth2Service {
         oauthUser.setAuthProvider(token.getAuthorizedClientRegistrationId());
         oauthUser.setRole("ROLE_USER");
         oauthUser.setName((String) token.getPrincipal().getAttributes().get("name"));
+        if (oauthUser.getName() == null || oauthUser.getName().isEmpty()) {
+            oauthUser.setName((String) token.getPrincipal().getAttributes().get("login"));
+        }
         if (token.getPrincipal().getAttributes().get("email") == null
                 && token.getAuthorizedClientRegistrationId().equals("github")) {
             oauthUser.setEmail(oauthUser.getUsername() + "@github.com");
