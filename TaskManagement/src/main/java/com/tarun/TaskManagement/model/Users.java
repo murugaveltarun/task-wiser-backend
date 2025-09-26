@@ -158,7 +158,7 @@ public class Users {
         this.lastLoginAt = lastLoginAt;
     }
 
-    public boolean isActive() {
+    public boolean getActive() {
         return isActive;
     }
 
