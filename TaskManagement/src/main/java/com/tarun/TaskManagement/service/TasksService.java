@@ -15,8 +15,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TasksService {
@@ -134,6 +137,7 @@ public class TasksService {
         }
         return user;
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     public Tasks getTask(int userid, int taskid) throws IllegalAccessException {
         Tasks task = tasksRepo.findById(taskid).orElse(null);
@@ -194,18 +198,15 @@ public class TasksService {
         if(dbUser == null){
             throw new EntityNotFoundException("User not found for the id : " + id);                       //if not found user with task id
         }
-        if(user.getEmail() == null || user.getName() ==null || user.getUsername() == null || user.getActive()){
+        if(user.getEmail() == null || user.getName() ==null || user.getUsername() == null){
             throw new MissingFieldException("Missing field. All these fields are mandatory to update task : email, name, username, active. ");
         }
-        if(user.getId() == dbUser.getId()){                                   //check whether user id is same in both the task and user principal
             dbUser.setActive(user.getActive());
             dbUser.setName(user.getName());
             dbUser.setEmail(user.getEmail());
             dbUser.setUsername(user.getUsername());
 
             return usersRepo.save(dbUser);
-        }
-        throw new IllegalAccessException("Unauthorized for updating the task with id : " + id);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -235,5 +236,45 @@ public class TasksService {
 
             return tasksRepo.save(dbTask);
 
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Tasks> getAllTasksFromUserAll(int id) {
+        return tasksRepo.findByUserIdByAdminAll(id);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String,?> getAllStats() {
+
+        LocalDate today = LocalDate.now();
+
+        Map<String,Object> data = new HashMap<>();
+
+        Map<String,Object> tasks = new HashMap<>();
+        Map<String,Object> users = new HashMap<>();
+
+        //tasks
+        tasks.put("total",tasksRepo.count());
+        tasks.put("createdToday",tasksRepo.countByCreatedAt(today));
+        tasks.put("modifiedToday",tasksRepo.countByLastModifiedAt(today));
+        tasks.put("createdDates", tasksRepo.getAllCreatedDates());
+        tasks.put("modifiedDates", tasksRepo.getAllModifiedDates());
+        tasks.put("status",tasksRepo.countByStatus());
+        tasks.put("priority",tasksRepo.countByPriority());
+        data.put("tasks",tasks);
+
+        //users
+        users.put("total", usersRepo.count());
+        users.put("createdToday", usersRepo.countByCreatedAt(today));
+        users.put("lastLoginToday", usersRepo.countByLastLoginAt(today));
+        users.put("authProviders", usersRepo.countByAuthProvider());
+        users.put("createdDates", usersRepo.getAllCreatedDates());
+        users.put("lastLoginDates", usersRepo.getAllLastLoginDates());
+        data.put("users", users);
+
+        //avg
+        double avgTasks = (double) tasksRepo.count() / Math.max(usersRepo.count(),1);
+        avgTasks = Math.round(avgTasks * 100.0) / 100.0; //to round it to 2 decimals
+        users.put("avgTasksPerUser",avgTasks);
+
+        return data;
     }
 }

@@ -30,7 +30,7 @@ public class Oauth2Service {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    public RedirectView auth(OAuth2AuthenticationToken token, HttpServletResponse response) {
+    public RedirectView auth(OAuth2AuthenticationToken token, HttpServletResponse response) throws IllegalAccessException {
         System.out.println(token);
         Users oauthUser = new Users();
         oauthUser.setProviderId(token.getName());
@@ -81,26 +81,31 @@ public class Oauth2Service {
 
         System.out.println(dbUser);
         if(token.isAuthenticated()){
-            System.out.println("below");
-            System.out.println(dbUser);
-            String accessToken = service.generateToken(dbUser);
-            String refreshToken = service.generateRefreshToken(dbUser);
-            System.out.println("Access Token generated for userId : " + dbUser.getUsername() + " access token : " + accessToken);
-            System.out.println("Refresh Token generated for userId : " + dbUser.getUsername() + " refresh token : " + refreshToken);
+            if(dbUser.getActive() == true){
+                System.out.println("below");
+                System.out.println(dbUser);
+                String accessToken = service.generateToken(dbUser);
+                String refreshToken = service.generateRefreshToken(dbUser);
+                System.out.println("Access Token generated for userId : " + dbUser.getUsername() + " access token : " + accessToken);
+                System.out.println("Refresh Token generated for userId : " + dbUser.getUsername() + " refresh token : " + refreshToken);
 
-            ResponseCookie cookie = ResponseCookie.from("refreshToken",refreshToken)
-                    .httpOnly(true)
-                    .maxAge(Duration.ofDays(60))
-                    .path("/")
-                    .secure(true)
-                    .sameSite("None")
-                    .build();
+                ResponseCookie cookie = ResponseCookie.from("refreshToken",refreshToken)
+                        .httpOnly(true)
+                        .maxAge(Duration.ofDays(60))
+                        .path("/")
+                        .secure(true)
+                        .sameSite("None")
+                        .build();
 
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            System.out.println("cookie header" + cookie.toString());
+                System.out.println("cookie header" + cookie.toString());
 
-            return new RedirectView(frontendUrl + "/oauth2/callback/" + accessToken);
+                return new RedirectView(frontendUrl + "/oauth2/callback/" + accessToken);
+            }else{
+                throw new IllegalAccessException("Your account is disabled.");
+            }
+
         }
         throw new BadCredentialsException("Invalid username or password.");
 

@@ -42,7 +42,7 @@ public class UsersController {
 
     //to login a registered user
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseModel<String>>  login(@RequestBody Users user, HttpServletResponse servletResponse){
+    public ResponseEntity<ApiResponseModel<String>>  login(@RequestBody Users user, HttpServletResponse servletResponse) throws IllegalAccessException {
         System.out.println("Login controller : " + user);
         ApiResponseModel<String> response = new ApiResponseModel<>(true,"User Verified.", HttpStatus.OK.value(),service.verify(user,servletResponse));
         return ResponseEntity.status(response.getStatus()).body(response);
@@ -73,7 +73,7 @@ public class UsersController {
 //      localhost:8080/login/oauth2/code/google     -> once authenticated, this will be used to login. once login, redirected to oauth2/success.
 
     @GetMapping("/oauth2/success")
-    public RedirectView success(OAuth2AuthenticationToken token, HttpServletResponse servletResponse){
+    public RedirectView success(OAuth2AuthenticationToken token, HttpServletResponse servletResponse) throws IllegalAccessException {
         return oauthService.auth(token,servletResponse);
 
     }

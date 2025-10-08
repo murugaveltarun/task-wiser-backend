@@ -29,6 +29,7 @@ public class JwtService {
 
         claims.put("role",user.getRole());
         claims.put("name",user.getName());
+        claims.put("email",user.getEmail());
 
         return Jwts.builder()
                 .claims()
@@ -45,6 +46,7 @@ public class JwtService {
 
         Map<String,Object> claims = new HashMap<>();
         claims.put("role",user.getRole());
+        claims.put("email",user.getEmail());
 
         String refreshToken = Jwts.builder()
                 .claims()

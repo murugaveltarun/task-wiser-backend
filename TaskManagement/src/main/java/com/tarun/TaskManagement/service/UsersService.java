@@ -74,7 +74,7 @@ public class UsersService {
         return new ApiResponseModel<>(true,"User Created Successfully", HttpStatus.CREATED.value(),null);
     }
 
-    public String verify(Users user, HttpServletResponse response){
+    public String verify(Users user, HttpServletResponse response) throws IllegalAccessException {
         if(user.getUsername() == null || user.getPassword() == null){
             throw new MissingFieldException("Username and Password is necessary for login.");
         }
@@ -82,24 +82,29 @@ public class UsersService {
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
         if(authentication.isAuthenticated()){
             Users dbUser = repo.findByUsername(user.getUsername());
-            String accessToken = service.generateToken(dbUser);
-            String refreshToken = service.generateRefreshToken(dbUser);
-            System.out.println("Access Token generated for userId : " + dbUser.getUsername() + " access token : " + accessToken);
-            System.out.println("Refresh Token generated for userId : " + dbUser.getUsername() + " refresh token : " + refreshToken);
+            if (dbUser.getActive() == true){
+                String accessToken = service.generateToken(dbUser);
+                String refreshToken = service.generateRefreshToken(dbUser);
+                System.out.println("Access Token generated for userId : " + dbUser.getUsername() + " access token : " + accessToken);
+                System.out.println("Refresh Token generated for userId : " + dbUser.getUsername() + " refresh token : " + refreshToken);
 
-            ResponseCookie cookie = ResponseCookie.from("refreshToken",refreshToken)
-                    .httpOnly(true)
-                    .maxAge(Duration.ofDays(60))
-                    .path("/")
-                    .secure(true)
-                    .sameSite("None")
-                    .build();
+                ResponseCookie cookie = ResponseCookie.from("refreshToken",refreshToken)
+                        .httpOnly(true)
+                        .maxAge(Duration.ofDays(60))
+                        .path("/")
+                        .secure(true)
+                        .sameSite("None")
+                        .build();
 
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-            dbUser.setLastLoginAt(LocalDateTime.now());
-            repo.save(dbUser);
-            System.out.println("cookie header" + cookie);
-            return accessToken;
+                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                dbUser.setLastLoginAt(LocalDateTime.now());
+                repo.save(dbUser);
+                System.out.println("cookie header" + cookie);
+                return accessToken;
+            }else {
+                throw new IllegalAccessException("Your account is disabled.");
+            }
+
         }
         throw new BadCredentialsException("Invalid username or password.");
     }
@@ -113,15 +118,20 @@ public class UsersService {
         if(user == null){
             throw new IllegalAccessException("User Not found.");
         }
-        UserPrincipal userDetails = new UserPrincipal(user);
-        if(!service.validateToken(refreshToken,userDetails)) {
-            throw new IllegalAccessException("Invalid Token or Expired Token");
+        if(user.getActive() == true){
+            UserPrincipal userDetails = new UserPrincipal(user);
+            if(!service.validateToken(refreshToken,userDetails)) {
+                throw new IllegalAccessException("Invalid Token or Expired Token");
+            }
+            String accessToken = service.generateToken(user);
+            user.setLastLoginAt(LocalDateTime.now());
+            repo.save(user);
+            System.out.println("Access token generated for user '" + username + "' : " + accessToken);
+            return accessToken;
+        }else{
+            throw new IllegalAccessException("Your account is disabled.");
         }
-        String accessToken = service.generateToken(user);
-        user.setLastLoginAt(LocalDateTime.now());
-        repo.save(user);
-        System.out.println("Access token generated for user '" + username + "' : " + accessToken);
-        return accessToken;
+
 
     }
 

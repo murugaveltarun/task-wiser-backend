@@ -27,7 +27,6 @@ public class TasksController {
     @Autowired
     TasksController(TasksService service){
         this.service = service;
-
     }
 
 
@@ -146,7 +145,7 @@ public class TasksController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    // to get the tasks of the specific user
+    // to get the tasks of the specific user by page
     @GetMapping("/users/{id}/tasks")
     public ResponseEntity<ApiResponseModel<Map<String,Object>>> getAllTasksFromUser(@PathVariable int id,
                                                                              @RequestParam(defaultValue = "1") int page,
@@ -165,6 +164,14 @@ public class TasksController {
         result.put("limit",limit);
 
         ApiResponseModel<Map<String, Object>> response = new ApiResponseModel<>(true,"Fetched all tasks from the user id : " + id,HttpStatus.OK.value(),result);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    // to get the tasks of the specific user by page
+    @GetMapping("/users/{id}/tasks/all")
+    public ResponseEntity<ApiResponseModel<List<Tasks>>> getAllTasksFromUserAll(@PathVariable int id)  {
+        List<Tasks> tasks = service.getAllTasksFromUserAll(id);
+        ApiResponseModel<List<Tasks>> response = new ApiResponseModel<>(true,"Fetched all tasks from the user id : " + id,HttpStatus.OK.value(),tasks);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
@@ -281,4 +288,10 @@ public class TasksController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponseModel<Map<String,?>>> getAllStats(){
+        ApiResponseModel<Map<String,?>> response = new ApiResponseModel<>(true, "Search completed for tasks from all users.",HttpStatus.OK.value(),service.getAllStats());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 }
