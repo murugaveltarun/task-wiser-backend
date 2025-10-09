@@ -170,7 +170,7 @@ TaskWiser is a sophisticated task management system designed for both individual
 | `DELETE` | `/delete/task/{id}`          | Delete any task              | Admin  |
 | `GET`    | `/users/tasks/search`        | Search all tasks             | Admin  |
 | `GET`    | `/users/{id}/tasks/search`   | Search user's tasks          | Admin  |
-| `GET`    | `/stats`                     | Get system analytics         | Admin  |
+| `GET`    | `/stats`                     | Get TaskWiser analytics      | Admin  |
 
 ## 📁 Project Structure
 
